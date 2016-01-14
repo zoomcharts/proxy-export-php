@@ -1,5 +1,6 @@
 <?php
 //call this function:
+export();
 function export(){
     $type = $_POST["type"];
     $valid = array("image/jpeg"=>"jpeg", "image/png"=>"png", "application/pdf"=>"pdf", "image/svg" => "svg", "text/csv" => "csv", "application/vnd.ms-excel" => "xls");
@@ -7,8 +8,8 @@ function export(){
         $ext = $valid[$type];
         if ($_POST["encoding"] == "base64"){
             $c = $_POST["data"];
-            if ($p=strpos($_POST["data"], ",")){
-                $c = substr($_POST["data"], $p+1);
+            if ($p = strpos($_POST["data"], ",")){
+                $c = substr($_POST["data"], $p + 1);
             }
             $c = base64_decode($c);
         } else if ($_POST["encoding"] == "json") {
@@ -32,7 +33,8 @@ function export(){
             exit;
         } else if ($ext == "csv"){
             /* convert to csv */
-            $fmt = numfmt_create("lv_LV", NumberFormatter::PATTERN_DECIMAL);
+            $locale = "lv_LV";
+            $fmt = numfmt_create($locale, NumberFormatter::PATTERN_DECIMAL);
             foreach ($c as $row){
                 array_walk($row, function(&$item,$key) use ($fmt){
                     if ($key > 1){
@@ -44,7 +46,8 @@ function export(){
             }
             exit;
         } else if ($_POST["setdpi"]){
-            $fid=fopen($a="cache/tmp".microtime(true).".$ext", "w");
+            $cache_dir = "cache/tmp";
+            $fid = fopen($a = $cache_dir.microtime(true) . ".$ext", "w");
             fputs($fid, $c);
             fclose($fid);
             $dpi = (int)$_POST["setdpi"];
